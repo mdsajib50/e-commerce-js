@@ -35,26 +35,43 @@
         <section id="categories" class="categories-section">
           <div class="container">
             <h2>Shop by Category</h2>
-            <div class="categories-grid">
-              <div class="category-card">
-                <img src="assets/hats.jpg" alt="Hats">
-                <h3>Hats</h3>
-              </div>
-              <div class="category-card">
-                <img src="assets/caps.jpg" alt="Caps">
-                <h3>Caps</h3>
-              </div>
-              <div class="category-card">
-                <img src="assets/beanies.jpg" alt="Beanies">
-                <h3>Beanies</h3>
-              </div>
-              <div class="category-card">
-                <img src="assets/sunglasses.jpg" alt="Sunglasses">
-                <h3>Sunglasses</h3>
-              </div>
+            <div id="categories-grid">
+              
             </div>
           </div>
         </section>
+      </div>
+      <div id="category-page" class="page hidden">
+        <div class="container">
+          <h1 id="category-title">Products</h1>
+          <div class="filter-section">
+            <div class="filter-row">
+              <div class="filter-group">
+                <label for="sort-by">Sort By:</label>
+                <select name="" id="sort-by">
+                 <option value="relevance">Relevance</option>
+                 <option value="price-low">Price: Low To High</option>
+                 <option value="price-high">Price: High To Low</option>
+                 <option value="rating">Rating</option>
+                </select>
+              </div>
+              <div class="filter-group">
+                <label for="price-range">Max Price:</label>
+                <input type="range" name="" id="price-range" min="0" max="20000" value="20000">
+                <span id="price-value">10000TK</span>
+              </div>
+              <div class="filter-group">
+                <label for="brand-filter">Brand:</label>
+                <select name="" id="brand-filter">
+                  <option value="">All Brands:</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="product-grid" id="product-grid">
+
+          </div>
+        </div>
       </div>
     </main>
     <script src="src/main.js"></script>
