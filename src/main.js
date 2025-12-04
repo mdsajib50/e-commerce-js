@@ -1,6 +1,7 @@
 let categories = [];
 let products = [];
 let recentlyViewed = [];
+let filteredProducts=[];
 
 async function loadData() {
     try {
@@ -86,10 +87,70 @@ function showCategory(categoryId) {
     if (categoryId ==="recently-viewed") {
         filteredProducts = products.filter(product => recentlyViewed.includes(product.id));
 
-        document.getElementById('category-name').textContent = "Recently Viewed Products";
+        document.getElementById('category-title').textContent = "Recently Viewed Products";
     }else{
         filteredProducts = products.filter(product => product.category === categoryId);
         const category = categories.find(cat => cat.id === categoryId);
-        document.getElementById('category-name').textContent = category.name;
+        document.getElementById('category-title').textContent = category.name;
     }
 }
+showCategory(categoryId);
+
+function populateFilters() {
+    const brandFilter = document.getElementById("brand-filter");
+    const brand=[...new Set(filteredProducts.map(product=>product.brand))];
+
+    brandFilter.innerHTML=`<option>All Brands</option>`;
+    brands.forEach(brand=>{
+        const option=document.createElement("option");
+        option.value=brand;
+        option.textContent=brand;
+        brandFilter.appendChild(option);
+    })
+}
+
+function applyFilters() {
+    const sortBy=document.getElementById('sort-by').value;
+    const maxPrice=parseInt(document.getElementById('price-range').value);
+    const selectedBrand=document.getElementById('brand-filter').value;
+
+    document.getElementById('price-value').textContent= maxPrice;
+
+    let filtered =filteredProducts.filter(product=>{
+        if (product.price>maxPrice) {
+            return false
+        }
+        if (selectedBrand && product.brand !==selectedBrand) {
+            return false
+        }
+        return true;
+    })
+
+    switch (sortBy) {
+        case "price-low":
+            filtered.sort((a,b)=> a.price-b.price)
+            break;
+        case "price-high":
+            filtered.sort((a,b)=>b.price-a.price)
+            break;
+        case "rating":
+            filtered.sort((a,b)=>b.rating- a.rating)
+            break;    
+        default:
+            break;
+    }
+};
+
+function renderProducts(products=filteredProducts) {
+    const productGrid=document.getElementById('product-grid');
+    productGrid.innerHTML="";
+    if (products.length === 0) {
+        productGrid.innerHTML='<p>No Product Found Matching Your Criteria</p>';
+        return
+    }
+    products.forEach(product=>{
+        const productCard=document.createElement("div");
+        productCard.className="product-card";
+        productCard.onclick=()=>showProduct;
+    })
+};
