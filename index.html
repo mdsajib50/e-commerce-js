@@ -48,7 +48,7 @@
             <div class="filter-row">
               <div class="filter-group">
                 <label for="sort-by">Sort By:</label>
-                <select name="" id="sort-by">
+                <select name="" id="sort-by" onchange="applyFilters()">
                  <option value="relevance">Relevance</option>
                  <option value="price-low">Price: Low To High</option>
                  <option value="price-high">Price: High To Low</option>
@@ -57,12 +57,12 @@
               </div>
               <div class="filter-group">
                 <label for="price-range">Max Price:</label>
-                <input type="range" name="" id="price-range" min="0" max="20000" value="20000">
+                <input type="range" name="" id="price-range" min="0" max="20000" value="20000" onchange="applyFilters()">
                 <span id="price-value">TK</span>
               </div>
               <div class="filter-group">
                 <label for="brand-filter">Brand:</label>
-                <select name="" id="brand-filter">
+                <select name="" id="brand-filter" onchange="applyFilters()">
                   <option value="">All Brands:</option>
                 </select>
               </div>
@@ -74,6 +74,14 @@
         </div>
       </div>
     </main>
+    <div id="product-page" class="page-hidden">
+        <div class="container">
+          <div class="product-details" id="product-details">
+
+          </div>
+        </div>
+    </div>
+    
     <script src="src/main.js"></script>
   </body>
 </html>
