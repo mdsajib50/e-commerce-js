@@ -16,7 +16,7 @@
           <button type="submit">Search</button>
         </div>
         <div class="nav-actions">
-          <a href="#" class="nav-btn">Cart (0)</a>
+          <a href="#" class="nav-btn">Cart <span id="cart-count">(0)</span></a>
           <a href="#" class="nav-btn">Profile</a>
           <a href="#" class="nav-btn">Logout</a>
           <a href="#" class="nav-btn">Login</a>
@@ -73,15 +73,24 @@
           </div>
         </div>
       </div>
-    </main>
-    <div id="product-page" class="page-hidden">
+      <div id="product-page" class="page-hidden">
         <div class="container">
           <div class="product-details" id="product-details">
-
+            
           </div>
         </div>
-    </div>
-    
+      </div>
+      
+      <div id="cart-page" class="page hidden">
+          <div class="container">
+            <h1>My Cart</h1>
+            <div id="cart-item">
+
+            </div>
+            <div class="cart-summary" id="cart-summary"></div>
+          </div>
+      </div>
+    </main>
     <script src="src/main.js"></script>
   </body>
 </html>

@@ -3,6 +3,10 @@ let products = [];
 let recentlyViewed = [];
 let filteredProducts=[];
 
+let cart=[];
+let orders=[];
+let currentOrderSteps=1;
+
 let currentUser={
     name:'',
     email:'',
@@ -186,7 +190,7 @@ function renderProducts(products=filteredProducts) {
 };
 
 function showProduct(productId) {
-    const product=product.find(item=>item.id===productId);
+    const product=products.find(item=>item.id===productId);
     if (!product) return;
 
     if (!recentlyViewed.includes(productId)) {
@@ -199,6 +203,7 @@ function showProduct(productId) {
 
     const productDetail=document.getElementById('product-details');
     const deliveryDate=new Date();
+    
     deliveryDate.setDate(deliveryDate.getDate()+7);
 
     productDetail.innerHTML=`
@@ -248,7 +253,7 @@ function showProduct(productId) {
         </div>
         <div class="delivery-info">
             <h4>Delivery Information</h4>
-            <p>Delivery by ${deliveryDate.toLocalDateString()}</p>
+            <p>Delivery by ${deliveryDate.toLocaleDateString()}</p>
             <p>10 days return policy</p>
             <p>Cash on delivery available</p>
         </div>
@@ -260,4 +265,131 @@ function showProduct(productId) {
     `;
 
     showPage('product')
+};
+
+function addToCart(productId) {
+    const product=products.find(product=>product.id === productId);
+    if(!product) return;
+
+    const selectedColor= document.getElementById('selected-color')?.value || '';
+    const selectedSize= document.getElementById('selected-size')?.value || '';
+
+    const existingItem = cart.find(item=>
+        item.id === productId &&
+        item.color === selectedColor &&
+        item.size === selectedSize
+    )
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        cart.push({
+            id:productId,
+            name:product.name,
+            brand:product.brand,
+            price:product.price,
+            originalPrice:product.originalPrice,
+            discount:product.discount,
+            image:product.image,
+            color:selectedColor,
+            size:selectedSize,
+            quantity: 1
+        })
+    }
+    updateCartCount();
+    saveCartData();
+    alert('Product added to cart');
+    renderCart();
+}
+
+function renderCart() {
+    const cartItems=document.getElementById('cart-item');
+    const cartSummary=document.getElementById('cart-summary');
+    if (cart.length === 0) {
+        cartItems.innerHTML=`<p>Your cart is empty, <a href="#" onclick="showPage(\'home\')">Continue Shopping</a></p>`;
+        cartSummary.innerHTML='';
+        return;
+    }
+
+    cartItems.innerHTML='';
+    let totalOriginal =0;
+    let totalDiscounted =0;
+
+    cart.forEach((item,index)=>{
+        const itemTotal = item.price * item.quantity;
+        const itemOriginalTotal = item.originalPrice * item.quantity;
+        totalOriginal = itemOriginalTotal;
+        totalDiscounted = itemTotal;
+
+        const cartItemsCard=document.createElement('div');
+        cartItemsCard.className='cart-item-card';
+
+        cartItemsCard.innerHTML=`
+            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+            <div class="cart-item-details">
+            <h3>${item.name}</h3>
+            <div class="brand">${item.brand}</div>
+            ${item.color ? `<div>Color: ${item.color}</div>` :''}
+            ${item.size ? `<div>Size: ${item.size}</div>` :''}
+            <div class="product-price">
+                <span class="current-price">${item.price}</span>
+                <span class="original-price">${item.originalPrice}</span>
+                <span class="discount-price">${item.discount}% OFF</span>
+                </div>
+            <div class="quantity-control">
+                <button onclick="updateCartItemQuantity(${index}, ${item.quantity - 1})">-</button>
+                <input type="number" value="${item.quantity}" min="1" onchange="updateCartItemQuantity(${index}, parseInt(this.value))">
+                <button onclick="updateCartItemQuantity(${index}, ${item.quantity + 1})">+</button>
+            </div>
+            <div class="item-total">Total: ${itemTotal}</div>
+            <button class="remove-item" onclick="removeCartItem(${index})">Remove</button>
+            </div>
+        `;
+        cartItems.appendChild(cartItemsCard);
+    });
+    const deliveryFee= totalDiscounted > 500 ? 0 : 50;
+    const grandTotal= totalDiscounted + deliveryFee;
+
+    cartSummary.innerHTML=`
+        <h3>Cart Summary</h3>
+        <div class="summary-item">
+        <span>Original Total:</span>
+        <span>${totalOriginal}</span>
+        </div>
+        <div class="summary-item">
+        <span>Discounted Total:</span>
+        <span>${totalDiscounted}</span>
+        </div>
+        <div class="summary-item">
+        <span>Delivery Fee:</span>
+        <span>${deliveryFee === 0 ? 'Free' : deliveryFee}</span>
+        </div>
+        <div class="summary-item">
+        <span>Total Amount:</span>
+        <span>${grandTotal}</span>
+        </div>
+        <button class="btn-primary" onclick="proceedToCheckout()">Proceed to Checkout</button>
+    `;
+
+}
+
+function updateCartCount() {
+    const cartCount= cart.reduce((total, item)=>total + item.quantity, 0);
+    document.getElementById('cart-count').innerText = `(${cartCount})`;
+}
+
+function saveCartData() {
+    try {
+        window.cartData = cart;
+    } catch (error) {
+        console.log("Storage not available");
+        
+    }
+}
+function saveRecentlyViewed() {
+    try {
+        window.recentlyViewedData=recentlyViewed;
+    } catch (error) {
+        console.log("Storage not available.");
+        
+    }
 }
