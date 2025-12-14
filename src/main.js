@@ -267,6 +267,12 @@ function showProduct(productId) {
     showPage('product')
 };
 
+function buyNow(productId) {
+    addToCart(productId);
+
+    showPage('order');
+};
+
 function addToCart(productId) {
     const product=products.find(product=>product.id === productId);
     if(!product) return;
@@ -372,6 +378,136 @@ function renderCart() {
 
 }
 
+function updateCartItemQuantity(index, change,newValue=null) {
+    if (newValue !== null) {
+        cart[index].quantity = Math.max(1, parseInt(newValue) || 1);
+    } else {
+        cart[index].quantity = Math.max(1,cart[index].quantity + change);
+    }
+    saveCartData();
+    renderCart();
+    updateCartCount();
+};
+
+function renderOrderSteps() {
+    const orderSteps=document.getElementById('order-steps');
+    if (currentOrderSteps === 1) {
+        if (!currentUser.name || !currentUser.phone || !currentUser.address) {
+            orderSteps.innerHTML=`
+            <div class="order-form">
+            <h2>Step 1: Enter Your Details</h2>
+            <div class="form-group">
+
+            <label for="user-name">Name:</label>
+            <input type="text" id="user-name" value="${currentUser.name}">
+            <label for="user-email">Email:</label>
+            <input type="email" id="user-email" value="${currentUser.email}">
+            <label for="user-phone">Phone:</label>
+            <input type="text" id="user-phone" value="${currentUser.phone}">
+            <label for="user-address">Address:</label>
+            <textarea id="user-address">${currentUser.address}</textarea>
+            <button class="btn-primary" onclick="saveUserDetails()">Save and Continue</button>
+            </div>
+
+            </div>
+            `;
+        }else{
+            currentOrderSteps=2;
+            renderOrderSteps();
+        }
+    }else if (currentOrderSteps === 2) {
+        const cartTotal= cart.reduce((total,item)=> total + (item.price * item.quantity),0);
+        const deliveryFee= cartTotal > 500 ? 0 : 50;
+        const grandTotal= cartTotal + deliveryFee;
+
+        let cartItemsHTML='';
+        cart.forEach(item=>{
+            cartItemsHTML +=`
+            <div class="cart-item">
+            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+
+                <div class="cart-item-details">
+                <h4>${item.name}</h4>
+                <div class="product-brand">${item.brand} </div>
+                ${item.color ? `<p>Color: ${item.color}</p>` :''}
+                ${item.size ? `<p>Size: ${item.size}</p>` :''}
+                <p>Quantity: ${item.quantity}</p>
+                <p>Price: ${item.price * item.quantity}</p>
+                </div>
+            </div>
+            `;
+        });
+        orderSteps.innerHTML=`
+        <div class="order-form"> 
+            <h2>Step 2: Order Summary</h2>
+            <div class="address-section">
+                <h3>Delivery Address</h3>
+                <p>${currentUser.name}</p>
+                <p>${currentUser.phone}</p>
+                <p>${currentUser.address}</p>
+            </div>
+            <h3>Order Items</h3>
+            ${cartItemsHTML}
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Items Total:</span>
+                    <span>${cartTotal}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery Fee:</span>
+                    <span>${deliveryFee === 0 ? 'Free' : deliveryFee}</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-row summary-total">
+                    <span>Total Amount:</span>
+                    <span>${grandTotal}</span>
+                </div>
+            </div>
+               
+            <button class="btn-primary" onclick="proceedToPayment()">Proceed to Payment</button>
+        </div>
+        `;
+    }else if (currentOrderSteps === 3) { 
+        orderSteps.innerHTML=`
+        <div class="order-form">
+            <h2>Step 3: Payment</h2>
+            <div class="payment-methods">
+                <label>
+                    <input type="radio" name="payment-method" value="cod" checked>
+                    Cash on Delivery
+                </label>
+                <label>
+                    <input type="radio" name="payment-method" value="card" disabled>
+                    Credit/Debit Card (Coming Soon)
+                </label>
+                <label>
+                    <input type="radio" name="payment-method" value="upi" disabled>
+                    UPI (Coming Soon)
+                </label>
+            </div>
+            <div class="payment-summary">
+                <p>Total Amount to be Paid: ${
+                    cart.reduce((total,item)=> total + (item.price * item.quantity),0) +
+                    (cart.reduce((total,item)=> total + (item.price * item.quantity),0) > 500 ? 0 : 50)
+                }</p>
+                <button class="btn-primary" onclick="completeOrder()">Complete Order</button>
+            </div>
+        </div>
+        `;  
+    } 
+}
+function removeCartItem(index) {
+    cart.splice(index,1);
+    saveCartData();
+    renderCart();
+    updateCartCount();
+}
+
+function proceedToCheckout() {
+    currentOrderSteps = 1;
+    renderCheckout();
+    showPage('order');
+}
 function updateCartCount() {
     const cartCount= cart.reduce((total, item)=>total + item.quantity, 0);
     document.getElementById('cart-count').innerText = `(${cartCount})`;
