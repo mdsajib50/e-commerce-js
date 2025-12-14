@@ -496,6 +496,34 @@ function renderOrderSteps() {
         `;  
     } 
 }
+function saveOrderDetails() {
+    const name=document.getElementById('user-name').value.trim();
+    const email=document.getElementById('user-email').value.trim();
+    const phone=document.getElementById('user-phone').value.trim();
+    const address=document.getElementById('user-address').value.trim();
+
+    if (!name || !phone || !address) {
+        alert('Please fill in all required fields.');
+        return;
+    }
+    currentUser={
+        name,
+        email,
+        phone,
+        address
+    };
+    saveUserData();
+    currentOrderSteps=2;
+    renderOrderSteps();
+}
+function saveUserData() {
+    try {
+        window.userData = currentUser;
+    } catch (error) {
+        console.log("Storage not available");
+    }
+}
+
 function removeCartItem(index) {
     cart.splice(index,1);
     saveCartData();
