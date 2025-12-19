@@ -516,13 +516,136 @@ function saveOrderDetails() {
     currentOrderSteps=2;
     renderOrderSteps();
 }
-function saveUserData() {
+
+function proceedToPayment() {
+    currentOrderSteps=3;
+    renderOrderSteps();
+}
+
+function completeOrder() {
+    const paymentMethod=document.querySelector('input[name="payment-method"]:checked').value;
+    const orderId=`ORD${Date.now()}`;
+    const orderDate=new Date().toLocaleDateString();
+
+    const newOrder={
+        orderId,
+        items:[...cart],
+        totalAmount: cart.reduce((total,item)=> total + (item.price * item.quantity),0) +
+                     (cart.reduce((total,item)=> total + (item.price * item.quantity),0) > 500 ? 0 : 50),
+        orderDate,
+        paymentMethod,
+        status:'Processing',
+        address:currentUser.address,
+        phone:currentUser.phone,
+        name:currentUser.name
+    };
+    orders.push(newOrder);
+    cart=[];
+    saveOrdersData();
+    saveCartData();
+    renderCart();
+    updateCartCount();
+    currentOrderSteps=1;
+    document.getElementById('order-steps').innerHTML=`<div class='order-success'>
+        <h2>Order Placed Successfully!</h2>
+        <p>Your order ID is <strong>${orderId}</strong></p>
+        <button class="btn-primary" onclick="showPage('orders')">View Orders</button>
+        <button class="btn-secondary" onclick="showPage('home')">Continue Shopping</button> 
+    </div>`;
+}
+ 
+function renderOrders() {
+    const ordersList=document.getElementById('orders-list');
+    if (orders.length === 0) {
+        ordersList.innerHTML=`<p>No orders placed yet. <a href="#" onclick="showPage(\'home\')">Start Shopping</a></p>`;
+        return;
+    }
+    ordersList.innerHTML='';
+    const sortedOrders=[...orders].sort((a,b)=> new Date(b.orderDate) - new Date(a.orderDate));
+    sortedOrders.forEach(order=>{
+        const orderCard=document.createElement('div');
+        orderCard.className='order-card';
+
+        let orderItemsHTML='';
+        order.items.forEach(item=>{
+            orderItemsHTML +=`
+            <div class="order-item">
+                <img src="${item.image}" alt="${item.name}" class="order-item-image">
+                <div class="order-item-details"></div>
+                    <h4>${item.name}</h4>
+                    <div class="product-brand">${item.brand} </div>
+                    ${item.color ? `<p>Color: ${item.color}</p>` :''}
+                    ${item.size ? `<p>Size: ${item.size}</p>` :''}
+                    <p>Quantity: ${item.quantity}</p>
+                    <p>Price: ${item.price * item.quantity}</p>
+            </div>
+        </div>
+    `;
+        });
+        orderCard.innerHTML=`
+            <div class="order-header" onclick="toggleOrderDetails('${order.orderId}')"></div>
+            <h3>Order ID: ${order.orderId}</h3>
+            <p>Order Date: ${order.orderDate}</p>
+            <p>Total Amount: $${order.totalAmount}</p>
+            <p>Payment Method: ${order.paymentMethod}</p>
+            <p>Status: ${order.status}</p>
+            <div class="order-items" style="display: none;" id="order-details-${order.orderId}">
+                ${orderItemsHTML}
+            </div>
+            <div class="cart-summary">
+                
+                <div class="summary-row">
+                    <span>Items Total:</span>
+                    <span>${order.total}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery Charge:</span>
+                    <span>${order.deliveryCharge === 0 ? 'Free' : `$${order.deliveryCharge}`}</span>
+                </div>
+                <div class="summary-divider"></div>
+                <div class="summary-row summary-total">
+                    <span>Total Paid:</span>
+                    <span>${order.total + order.deliveryCharge}</span>
+                </div>
+            </div>
+        `;
+        ordersList.appendChild(orderCard);
+    });
+};
+
+function toggleOrderDetails(orderId) {
+    // headerElement as parameter to identify which order to toggle understand this codes later
+    // const isVisible=orderDetails.style.display ==='block';
+    // orderDetails.style.display=isVisible ? 'none' : 'block';
+    // const orderCard=headerElement.parentElement;
+    // const orderId=orderCard.querySelector('h3').innerText.split(': ')[1];
+    // const orderDetails=document.getElementById(`order-details-${orderId}`);
+
+    const orderDetails=document.getElementById(`order-details-${orderId}`);
+    const arrowIcon=orderDetails.previousElementSibling.querySelector('.arrow-icon');
+    if (orderDetails.style.display === "none") {
+        orderDetails.style.display = "block";
+        arrowIcon.textContent = "▼";
+    } else {
+        orderDetails.style.display = "none";
+        arrowIcon.textContent = "▶";
+    }
+}
+
+function saveOrdersData() {
     try {
-        window.userData = currentUser;
+        window.ordersData = orders;
     } catch (error) {
         console.log("Storage not available");
     }
 }
+    function saveUserData() {
+            try {
+                window.userData = currentUser;
+            } catch (error) {
+                console.log("Storage not available");
+            }
+    }
 
 function removeCartItem(index) {
     cart.splice(index,1);
