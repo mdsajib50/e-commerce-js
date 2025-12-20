@@ -589,11 +589,11 @@ function renderOrders() {
             <p>Total Amount: $${order.totalAmount}</p>
             <p>Payment Method: ${order.paymentMethod}</p>
             <p>Status: ${order.status}</p>
-            <div class="order-items" style="display: none;" id="order-details-${order.orderId}">
+            <div class="order-details" style="display: none;" id="order-details-${order.orderId}">
                 ${orderItemsHTML}
             </div>
-            <div class="cart-summary">
-                
+            <div class="order-summary">
+                <h3>Order Summary</h3>
                 <div class="summary-row">
                     <span>Items Total:</span>
                     <span>${order.total}</span>
