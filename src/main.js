@@ -33,6 +33,10 @@ async function loadData() {
 }
 
 function initializeApp() {
+    loadUserData();
+    loadCartData();
+    loadOrderData();
+    loadRecentlyViewed()
     renderCategories();
     showPage('home');
 }
@@ -646,6 +650,22 @@ function saveOrdersData() {
                 console.log("Storage not available");
             }
     }
+
+function loadAccountPage() {
+    document.getElementById('user-name').value = currentUser.name || '';
+    document.getElementById('user-email').value = currentUser.email || '';
+    document.getElementById('user-phone').value = currentUser.phone || '';
+    document.getElementById('user-address').value = currentUser.address || '';
+}
+function saveUserInfo() {
+    currentUser.name = document.getElementById('user-name').value.trim();
+    currentUser.email = document.getElementById('user-email').value.trim();
+    currentUser.phone = document.getElementById('user-phone').value.trim();
+    currentUser.address = document.getElementById('user-address').value.trim();
+
+    saveUserData();
+    alert('Information save successfully')
+}
 
 function removeCartItem(index) {
     cart.splice(index,1);
