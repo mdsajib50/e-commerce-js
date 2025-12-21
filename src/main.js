@@ -701,3 +701,23 @@ function loadCartData() {
         console.log("Storage not available.");
     }
 }
+
+function loadOrderData() {
+    try {
+        if (window.ordersData) {
+            orders = window.ordersData
+        }
+    } catch (error) {
+        console.log("Storage not available.");
+    }
+}
+
+function loadRecentlyViewed() {
+    try {
+        if (window.recentlyViewedData) {
+            orders = window.recentlyViewedData
+        }
+    } catch (error) {
+        console.log("Storage not available.");
+    }
+}
