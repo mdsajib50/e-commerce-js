@@ -680,3 +680,4 @@ function saveRecentlyViewed() {
         
     }
 }
+
