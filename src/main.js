@@ -681,3 +681,23 @@ function saveRecentlyViewed() {
     }
 }
 
+function loadUserData() {
+    try {
+        if (window.userData) {
+            currentUser = window.userData
+        }
+    } catch (error) {
+        console.log("Storage not available.");
+    }
+}
+
+function loadCartData() {
+    try {
+        if (window.cartData) {
+            cart =window.cartData;
+            updateCartCount()
+        }
+    } catch (error) {
+        console.log("Storage not available.");
+    }
+}
